@@ -1,0 +1,30 @@
+---
+title: "Final_Project"
+author: "Max Dodge"
+date: "3/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(Quandl)
+library(ggplot2)
+```
+
+
+```{r}
+stock_data <- Quandl("YALE/SPCOMP", api_key="dmLyKKFRBFqUidisexyz") #Yale Department of Economics data
+library(readr)
+median_income <- read_csv("~/Desktop/MEPAINUSA672N (1).csv", 
+    col_types = cols(MEPAINUSA672N = col_number()))
+```
+
+```{r}
+
+```
+
