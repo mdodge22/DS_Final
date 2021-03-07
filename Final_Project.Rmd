@@ -1,27 +1,39 @@
 ---
-title: "Final_Project"
+title: "Final Project"
 author: "Max Dodge"
 date: "3/7/2021"
 output: html_document
 ---
 
+#Fight for $15: Does a Higher Minimum Wage Increase the Price of Essential Goods
+
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-
+Libraries:
 ```{r}
-library(Quandl)
 library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(maps)
+library(ggmap)
+library(gplots)
+library(RColorBrewer)
+library(sf)
+library(leaflet)
+library(plotly)
+library(ggthemes)
+library(gganimate)     
+library(transformr)   
+library(gifski)
+theme_set(theme_minimal())
 ```
 
 
 ```{r}
-stock_data <- Quandl("YALE/SPCOMP", api_key="dmLyKKFRBFqUidisexyz") #Yale Department of Economics data
-library(readr)
-median_income <- read_csv("~/Desktop/MEPAINUSA672N (1).csv", 
-    col_types = cols(MEPAINUSA672N = col_number()))
+
 ```
 
 ```{r}
