@@ -5,7 +5,7 @@ date: "3/7/2021"
 output: html_document
 ---
 
-#Fight for $15: Does a Higher Minimum Wage Increase the Price of Essential Goods
+Fight for $15: Does a Higher Minimum Wage Increase the Price of Essential Goods
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -28,15 +28,51 @@ library(ggthemes)
 library(gganimate)     
 library(transformr)   
 library(gifski)
+library(readr)
+library(readxl)
 theme_set(theme_minimal())
 ```
 
-
 ```{r}
+Minimum_Wage_Data <- read_csv("Minimum Wage Data.csv", 
+    col_types = cols(State.Minimum.Wage = col_number(), 
+        State.Minimum.Wage.2020.Dollars = col_number(), 
+        Federal.Minimum.Wage = col_number(), 
+        Federal.Minimum.Wage.2020.Dollars = col_number(), 
+        Effective.Minimum.Wage = col_number(), 
+        Effective.Minimum.Wage.2020.Dollars = col_number(), 
+        CPI.Average = col_number()))
+
+PovertyReport <- read_excel("PovertyReport.xlsx", 
+    col_types = c("text", "skip", "skip", 
+        "skip", "numeric", "skip", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric"), skip = 5) #2019 Data
+
+povertyreport <- PovertyReport %>% 
+  rename(State = Name,
+         povertyrate = 'Percent...2')
 
 ```
 
 ```{r}
-
+combined <- Minimum_Wage_Data %>% 
+  filter(Year == 2019) %>% 
+  left_join(povertyreport, 
+            by = "State")
 ```
+
+```{r}
+combined %>% 
+  filter(Effective.Minimum.Wage.2020.Dollars >= 0) %>% 
+  ggplot(aes(x = Effective.Minimum.Wage.2020.Dollars, 
+             y = povertyrate)) +
+  geom_point() +
+  geom_text(aes(label = State), hjust = 0, nudge_x = 0.05, size = 2.5) +
+  labs(title = "Minimum Wage vs. Poverty Rate",
+       y = "Poverty Rate", x = "Minimum Wage", 
+       caption = "Max Dodge")
+```
+
+
 
