@@ -1,7 +1,7 @@
 ---
-title: "Understanding Minimum Wage in The United States"
+title: "Trying to Make Sense of Minimum Wage in The United States"
 author: "Max Dodge"
-date: "3/7/2021"
+date: "3/13/2021"
 output: html_document
 ---
 
@@ -75,15 +75,43 @@ combined <- Minimum_Wage_Data %>%
 ```
 
 ## Push For $15
-The recent push to raise the federal minimum wage has gained traction in recent years, and as Joe Biden has taken office the push has only grown more urgent. Most recently, Congressional Democrats have attempted to raise the minimum wage through a provision in the American Rescue Plan (COVID Relief Bill). Even among democrats the minimum wage hike did not have the votes to get through the senate and it has been delayed, potentially for years. The purpose of this project is to explore the how the minimum wage system works in the United States, with both the federal and state governments having a say. I will also explore how minimum wage affects overall quality of life and inequality. 
+Minimum wage in the United States is a mess. The federally mandated minimum wage is 7.25/hour, the same level it has been since July 24th, 2009. 7.25 per hour doesn't sound like a lot, but due to inflation workers have been effectively getting a pay cut each year. You would have to make 8.60 in today's money to be on par with a worker making 7.25 more than a decade ago. The good news, at least for workers living in Democrat controlled cities and states, is that minimum wage can be higher depending on the locality. Within the NYC-Newark-Bridgeport region there are more than five different minimum wages depending on where you are. 
+
+```{r, fig.align='center', echo=FALSE, warning=FALSE}
+Minimum_Wage_Data %>% 
+  mutate(Label = ifelse(Year == 2020, Effective.Minimum.Wage.2020.Dollars,NA)) %>%  #From rstudio community
+  mutate(Label2 = ifelse(Year == 1990 & State == "Washington", 
+                         Effective.Minimum.Wage.2020.Dollars,NA)) %>% 
+  mutate(Label3 = ifelse(Year == 1968 & 
+                           (State %in% c("Minnesota",
+                                         "Michigan",
+                                         "Washington")), 
+                         Effective.Minimum.Wage.2020.Dollars,NA)) %>% 
+  filter(State %in% c("Minnesota","Michigan", "California",
+                      "Washington","Texas")) %>% 
+  ggplot(aes(x = Year, y = Effective.Minimum.Wage.2020.Dollars, 
+             color = State)) +
+  geom_line() +
+  geom_label(aes(label = Label), nudge_x = 2.5, size = 4) +
+  geom_label(aes(label = Label2), nudge_x = 2.9, size = 4) +
+  geom_label(aes(label = Label3), nudge_x = -2.9, size = 4) +
+  expand_limits(x = 1964) +
+  labs(y = "Wage", x = "", title = "Effective Minimum Wage Adjusted for Inflation (1968-2020)",
+       caption = "Texas and Minnesota both had a minimum wage of $8.55 in 1968") +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+The push to raise the federal minimum wage has gained traction in recent years, and as Joe Biden has taken office the push has only grown more urgent. Most recently, Congressional Democrats have attempted to raise the minimum wage through a provision in the American Rescue Plan (COVID Relief Bill). Even among democrats the minimum wage hike did not have the votes to get through the senate and it has been delayed, potentially for years. The purpose of this project is to explore the how the minimum wage system works in the United States, with both the federal and state governments having a say. I will also explore how minimum wage affects overall quality of life and inequality. 
 
 ## "Effective" Minimum Wage
 In the United States States have some power over the minimum wage; However, the minimum wage cannot be lower than the federal minimum wage (7.25/hour). The Effective minimum wage in each state is either that states minimum wage, if it is above 7.25, or it is the federally mandated minimum wage. This is what the effective minimum wages in each state looked like in 2019.
 
-```{r}
+```{r, fig.align='center', echo=FALSE}
 state_minimum <- map_data("state")
 
-min_wageUS <- combined %>% 
+combined %>% 
   ggplot() +
   geom_map(map = state_minimum,
            aes(map_id = state, fill = Effective.Minimum.Wage)) +
@@ -91,15 +119,14 @@ min_wageUS <- combined %>%
   scale_fill_continuous(name="Wage", 
             low = "navy", high = "lightblue") +
   theme_map() +
-  labs(title = "Minimum Hourly Wage in 2019")
-
-ggplotly(min_wageUS)
+  labs(title = "Minimum Hourly Wage in 2019") +
+  theme(plot.background = element_rect(fill = "lightyellow"))
 ```
 
-## Does Minimum Wage Determine Median Income?
-Now we know that minimum wage can vary widely by state, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. A company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities there would be differences in minimum wage and thus either differences in unemployment rate or differences in 
+## Does Minimum Wage Actually Determine Median Income?
+Now we know that minimum wage can vary widely by state, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. A company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities there would be differences in minimum wage and thus either differences in unemployment rate or median income. 
 
-```{r}
+```{r, fig.align='center', echo =FALSE}
 cities <- tibble(
   city = c("Seattle", "NYC", "San Francisco", "Houston", 
            "Jacksonville", "Minneapolis"),
@@ -109,8 +136,8 @@ cities <- tibble(
   )
 
 cities %>% 
-  ggplot(aes(x = minimum_wage, y = unemployment, 
-                 size = median_income, color = city)) +
+  ggplot(aes(x = minimum_wage, y = median_income, 
+                 size = unemployment, color = city)) +
   geom_point(alpha = .5) +
   geom_text(aes(label = city), size = 4, hjust = 0, 
             nudge_x = .29, nudge_y = .05, alpha = 1) +
@@ -122,37 +149,52 @@ cities %>%
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_blank()) +
   guides(color=FALSE)
-
 ```
 
+## Does Minimum Wage Decrease Poverty? 
 
-
-## How Does The U.S Compare to Other Countries
-
-
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.align='center'}
 combined %>% 
   ggplot(aes(x = Effective.Minimum.Wage.2020.Dollars, 
              y = povertyrate)) +
-  geom_point() +
-  geom_text(aes(label = State), hjust = 0, nudge_x = 0.05, size = 2.5) +
-  labs(title = "Minimum Wage vs. Poverty Rate",
+  geom_smooth(method = lm, color = "lightblue", se = FALSE, alpha = .3) +
+  geom_point(alpha = .75) +
+  geom_text(aes(label = State), hjust = 0, nudge_x = 0.05, size = 2.5, check_overlap = TRUE) +
+  labs(title = "Minimum Wage Relative to Poverty Rate 2019",
        y = "Poverty Rate", x = "Minimum Wage", 
-       caption = "Max Dodge")
+       caption = "Overlapping labels have been ommited.") +
+  expand_limits(y = 21, x = 15) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  guides(color=FALSE)
+```
+
+## How Does The U.S Compare to Other Developed Nations
+```{r, fig.align='center',echo=FALSE,warning=FALSE}
+country_data %>%
+  mutate(Label = ifelse(Time == 2019 & (Country %in% c("United States","Korea","Russian Federation",
+                                                       "Canada", "Australia", "France")),Country,NA)) %>% 
+  filter(`Pay period` == "Hourly",
+         Series == "In 2019 constant prices at 2019 USD PPPs",
+         Country %in% c("United States", "Australia", "Russian Federation",
+                        "United Kingdom", "France", "Ireland",
+                        "Canada","Korea")) %>% 
+  ggplot(aes(x = Time, y = Value, color = Country)) +
+  geom_line() +
+  geom_label(aes(label = Label),  nudge_x = 1, nudge_y = .4, size = 2.5) +
+  expand_limits(x = 2021.75) +
+  labs(title = "Minimum Wage by Country Adjusted for Inflation (2001-2019)",
+       y = "Wage", x = "Year", caption = "Overlapping labels have been omitted for clarity. U.S wage is federal.") +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank())
+  
 ```
 
 
-Have minimum wage workers incomes kept up with inflation?
 
-```{r}
-Minimum_Wage_Data %>% 
-  filter(State %in% c("Minnesota","Michigan", "California",
-                      "Washington","Texas", "Florida")) %>% 
-  ggplot(aes(x = Year, y = Effective.Minimum.Wage.2020.Dollars, 
-             color = State)) +
-  geom_line()
-```
 
 ## Data
 The minimum wage data comes from the United States Department of Labor and encompasses the federal and state minimum wage from 1968-2020. The data set itself comes from [Kaggle](https://www.kaggle.com/lislejoem/us-minimum-wage-by-state-from-1968-to-2017). The poverty rate data comes directly from the United States Department of Agriculture and includes state poverty rate data from 2019. World minimum wage data comes from the  [OECD](https://stats.oecd.org/Index.aspx?DataSetCode=RMW). 
