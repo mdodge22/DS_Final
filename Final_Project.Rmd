@@ -75,7 +75,7 @@ combined <- Minimum_Wage_Data %>%
 ```
 
 ## Push For $15
-Minimum wage in the United States is a mess. The federally mandated minimum wage is 7.25/hour, the same level it has been since July 24th, 2009. 7.25 per hour doesn't sound like a lot, but due to inflation workers have been effectively getting a pay cut each year. You would have to make 8.60 in today's money to be on par with a worker making 7.25 more than a decade ago. The good news, at least for workers living in Democrat controlled cities and states, is that minimum wage can be higher depending on the locality. Within the NYC-Newark-Bridgeport region there are more than five different minimum wages depending on where you are. 
+Minimum wage in the United States is a mess. The federally mandated minimum wage is 7.25/hour, the same level it has been since July 24th, 2009. 7.25 per hour doesn't sound like a lot, but due to inflation workers have been effectively getting a pay cut each year. You would have to make 8.60 in today's money to be on par with a worker making 7.25 more than a decade ago. The good news, at least for workers living in cities and states controlled by the Democratic party, is that minimum wage can be higher depending on the locality. Within the NYC-Newark-Bridgeport region alone there are more than five different minimum wages depending on where you are. The U.S unlike other countries does not index the federal minimum wage to inflation which can lead to the aforementioned situation where workers can lose out each year. Since 1968 the "real" minimum wage, meaning inflation adjusted, has varied wildly from state to state and even at the federal level. Below is a visualization representing five states with distinct present day minimum wages and it shows how the real minimum wage has changed.
 
 ```{r, fig.align='center', echo=FALSE, warning=FALSE}
 Minimum_Wage_Data %>% 
@@ -103,10 +103,12 @@ Minimum_Wage_Data %>%
         panel.grid.major.x = element_blank())
 ```
 
-The push to raise the federal minimum wage has gained traction in recent years, and as Joe Biden has taken office the push has only grown more urgent. Most recently, Congressional Democrats have attempted to raise the minimum wage through a provision in the American Rescue Plan (COVID Relief Bill). Even among democrats the minimum wage hike did not have the votes to get through the senate and it has been delayed, potentially for years. The purpose of this project is to explore the how the minimum wage system works in the United States, with both the federal and state governments having a say. I will also explore how minimum wage affects overall quality of life and inequality. 
+For states like Washington and California, which started with higher minimum wages in 1968 the swings are very dramatic. The wage is almost cut in half from 1968 to 1990, with workers making 6.63 per hour in today's money. From 1990 to 2020 the wage then doubles with workers in those states making almost twice the amount of a minimum wage worker in Texas. For the states that had lower initial minimum wages the changes were not as dramatic. Texas and Minnesota have following almost the same trajectory until the mid 2010s, and Florida had been on the same path until the mid 2000s. It seems counter productive reopen the discussion on minimum wage every ten or so years, and to not have a livable minimum wage that is indexed to inflation. This article will explore the strangeness of the American minimum wage system, how it may or may not impact median income and unemployment, and how the U.S stacks up against the rest of the world. 
+
+The push to raise the federal minimum wage has gained traction in recent years, and as Joe Biden has taken office the push has only grown more urgent. Most recently, Congressional Democrats have attempted to raise the minimum wage through a provision in the American Rescue Plan (COVID Relief Bill). Even among democrats the minimum wage hike did not have the votes to get through the senate and it has been delayed, potentially for years. Progressives in congress want there to be a 15.00 per hour minimum wage, but have not yet made plans for indexing it for inflation. Some republicans have sought a lower minimum wage, in the 10-11 dollar range, with an adjustment every two years for inflation. 
 
 ## "Effective" Minimum Wage
-In the United States States have some power over the minimum wage; However, the minimum wage cannot be lower than the federal minimum wage (7.25/hour). The Effective minimum wage in each state is either that states minimum wage, if it is above 7.25, or it is the federally mandated minimum wage. This is what the effective minimum wages in each state looked like in 2019.
+As previously mentioned, In the United States, States have some power over the minimum wage; However, the minimum wage cannot be lower than the federal minimum wage (7.25/hour). The Effective minimum wage in each state is either that states minimum wage, if it is above 7.25, or it is the federally mandated minimum wage. Below is what the effective minimum wages in each state looked like in 2019. Notice that a significant number of states are still at the federal minimum wage created in 2009. A 15 dollar per hour minimum wage would raise minimum wage in every state in the country. 
 
 ```{r, fig.align='center', echo=FALSE}
 state_minimum <- map_data("state")
@@ -124,15 +126,15 @@ combined %>%
 ```
 
 ## Does Minimum Wage Actually Determine Median Income?
-Now we know that minimum wage can vary widely by state, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. A company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities there would be differences in minimum wage and thus either differences in unemployment rate or median income. 
+Now we know that minimum wage can vary widely by state and even more by city, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. For example, a company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities with differences in minimum wage there would be differences in median income and unemployment. Many opponents of a minimum wage hike say it will cost jobs and leads to a higher baseline of joblessness. I picked seven major cities in the U.S., each with a different minimum wage and compared their median incomes and unemployment rates.   
 
 ```{r, fig.align='center', echo =FALSE}
 cities <- tibble(
   city = c("Seattle", "NYC", "San Francisco", "Houston", 
-           "Jacksonville", "Minneapolis"),
-  minimum_wage = c(12.00,15.00,15.59,7.25,8.56,9.86),  #Source: City Gov 
-  median_income = c(49293,32320,52677,29259,30116,32905),  #Source: BLS
-  unemployment = c(2.2,3.6,1.9,3.5,2.7,3.0) #Source: ycharts
+           "Jacksonville", "Minneapolis", "Chicago"),
+  minimum_wage = c(12.00,15.00,15.59,7.25,8.56,9.86,13.00),  #Source: City Gov 
+  median_income = c(49293,32320,52677,29259,30116,32905,31613),  #Source: BLS
+  unemployment = c(2.2,3.6,1.9,3.5,2.7,3.0,3.1) #Source: ycharts
   )
 
 cities %>% 
@@ -142,7 +144,7 @@ cities %>%
   geom_text(aes(label = city), size = 4, hjust = 0, 
             nudge_x = .29, nudge_y = .05, alpha = 1) +
   expand_limits(y = 4, x = 20) +
-  labs(size = "Median Income", y = "Unemployment Rate", x = "Minimum Wage",
+  labs(size = "Unemployment Rate", y = "Median Income", x = "Minimum Wage",
        title = "U.S Cities January 2020") +
   theme_minimal() +
   theme(plot.background = element_rect(fill = "lightyellow"),
@@ -151,9 +153,12 @@ cities %>%
   guides(color=FALSE)
 ```
 
-## Does Minimum Wage Decrease Poverty? 
+There does not seem to be an overwhelmingly clear trend between median income and minimum wage and the city with the highest minimum wage had the lowest unemployment rate. Furthermore, all the cities, minus San Francisco, had very similar unemployment rates despite all having different minimum wages. However, the congressional budget office, when evaluating the recent 15 per hour minimum wage increase, estimated that raising the wage could result in employment decreasing by just under 1.5 million.
 
-```{r, echo=FALSE, fig.align='center'}
+## But Does Minimum Wage Decrease Poverty?
+While many of the opponents of a minimum wage increase argue against its potentially bad economic effects (unemployment). Those who favor an increase have a different economic argument, that the purpose of minimum wage is to reduce poverty for millions of Americans. Many progressives in congress have described the raising of the minimum wage as a human rights issue, that we cannot let so many people live in poverty in the wealthiest nation on earth. So does a higher minimum wage lead to a lower poverty rate? The data on this question is a little more clear and I fitted a linear regression to the data to illustrate the trend. There seems to be a clear pattern that as minimum wage increases poverty rate falls. There are some outliers to this trend; however, without getting too much into the statistics I would expect the $R^2$ (measure of fit) to be fairly low (not a strong correlation). The congressional budget office, when evaluating the recent 15 dollar minimum wage hike estimated that nearly a million people would be lifted out of poverty.  
+
+```{r, echo=FALSE, fig.align='center', message=FALSE}
 combined %>% 
   ggplot(aes(x = Effective.Minimum.Wage.2020.Dollars, 
              y = povertyrate)) +
@@ -172,6 +177,8 @@ combined %>%
 ```
 
 ## How Does The U.S Compare to Other Developed Nations
+There are some challenges when comparing the United States minimum wage to that of rest of the world. Should the federal minimum wage be used, or maybe the average between states? I opted for the federal minimum wage, as there are too many variables when taking into account all the different localities in the United States. Furthermore, which countries should be compared? I opted for mostly western European highly developed nations as a comparison. They are most similar to the United States in terms of economic system and development time line. I found data from the OECD that compared different countries minimum wages and set it equal to 2020 dollars and adjusted for purchasing power. The results are below.   
+
 ```{r, fig.align='center',echo=FALSE,warning=FALSE}
 country_data %>%
   mutate(Label = ifelse(Time == 2019 & (Country %in% c("United States","Korea","Russian Federation",
@@ -180,7 +187,7 @@ country_data %>%
          Series == "In 2019 constant prices at 2019 USD PPPs",
          Country %in% c("United States", "Australia", "Russian Federation",
                         "United Kingdom", "France", "Ireland",
-                        "Canada","Korea")) %>% 
+                        "Canada","Korea", "Luxembourg")) %>% 
   ggplot(aes(x = Time, y = Value, color = Country)) +
   geom_line() +
   geom_label(aes(label = Label),  nudge_x = 1, nudge_y = .4, size = 2.5) +
@@ -193,8 +200,10 @@ country_data %>%
   
 ```
 
+The United States is not far behind other developed nations when it comes to minimum wage; however, almost all other developed nations have seen their minimum wages rise in real terms while wages in the U.S. have fallen. The U.S. also has the most dramatic swings of any nation on the above visualization. A 15 dollar per hour would but the U.S. at one of the highest minimum wages in the world. 
 
-
+## Conclusion
+It's complicated. Like so many controversial issues the minimum wage has no clear solution. A 15.00 per hour wage could lift hundreds of thousands of Americans out of poverty, but maybe it wouldn't. It could reduce employment by over a million, but maybe it wouldn't. There are trade-offs, and it is never as clean cut as it seems. I hope this report helped make sense of what the current minimum wage in the United States, and what a 15 dollar per hour wage might look like. 
 
 ## Data
 The minimum wage data comes from the United States Department of Labor and encompasses the federal and state minimum wage from 1968-2020. The data set itself comes from [Kaggle](https://www.kaggle.com/lislejoem/us-minimum-wage-by-state-from-1968-to-2017). The poverty rate data comes directly from the United States Department of Agriculture and includes state poverty rate data from 2019. World minimum wage data comes from the  [OECD](https://stats.oecd.org/Index.aspx?DataSetCode=RMW). 
