@@ -100,6 +100,28 @@ ggplotly(min_wageUS)
 Now we know that minimum wage can vary widely by state, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. A company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities there would be differences in minimum wage and thus either differences in unemployment rate or differences in 
 
 ```{r}
+cities <- tibble(
+  city = c("Seattle", "NYC", "San Francisco", "Houston", 
+           "Jacksonville", "Minneapolis"),
+  minimum_wage = c(12.00,15.00,15.59,7.25,8.56,9.86),  #Source: City Gov 
+  median_income = c(49293,32320,52677,29259,30116,32905),  #Source: BLS
+  unemployment = c(2.2,3.6,1.9,3.5,2.7,3.0) #Source: ycharts
+  )
+
+cities %>% 
+  ggplot(aes(x = minimum_wage, y = unemployment, 
+                 size = median_income, color = city)) +
+  geom_point(alpha = .5) +
+  geom_text(aes(label = city), size = 4, hjust = 0, 
+            nudge_x = .29, nudge_y = .05, alpha = 1) +
+  expand_limits(y = 4, x = 20) +
+  labs(size = "Median Income", y = "Unemployment Rate", x = "Minimum Wage",
+       title = "U.S Cities January 2020") +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  guides(color=FALSE)
 
 ```
 
