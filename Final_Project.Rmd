@@ -1,19 +1,16 @@
 ---
-title: "Final Project"
+title: "Understanding Minimum Wage in The United States"
 author: "Max Dodge"
 date: "3/7/2021"
 output: html_document
 ---
 
-Fight for $15: Does a Higher Minimum Wage Increase the Price of Essential Goods
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-Libraries:
-```{r}
+```{r, include=FALSE,echo=FALSE}
+library(openintro)     # for the abbr2state() function
 library(ggplot2)
 library(tidyverse)
 library(lubridate)
@@ -30,41 +27,90 @@ library(transformr)
 library(gifski)
 library(readr)
 library(readxl)
+require(rgdal)
 theme_set(theme_minimal())
 ```
 
-```{r}
+```{r, include=FALSE, echo=FALSE}
+library(readr)
 Minimum_Wage_Data <- read_csv("Minimum Wage Data.csv", 
-    col_types = cols(State.Minimum.Wage = col_number(), 
-        State.Minimum.Wage.2020.Dollars = col_number(), 
-        Federal.Minimum.Wage = col_number(), 
-        Federal.Minimum.Wage.2020.Dollars = col_number(), 
-        Effective.Minimum.Wage = col_number(), 
-        Effective.Minimum.Wage.2020.Dollars = col_number(), 
-        CPI.Average = col_number()))
+    col_types = cols(Department.Of.Labor.Uncleaned.Data = col_skip(), 
+        Department.Of.Labor.Cleaned.Low.Value = col_skip(), 
+        Department.Of.Labor.Cleaned.Low.Value.2020.Dollars = col_skip(), 
+        Department.Of.Labor.Cleaned.High.Value = col_skip(), 
+        Department.Of.Labor.Cleaned.High.Value.2020.Dollars = col_skip(), 
+        Footnote = col_skip()))
 
+Country_Minwage <- read_csv("RMW_11032021214244461.csv", 
+    col_types = cols(SERIES = col_skip(), 
+        PERIOD = col_skip(), TIME = col_double(), 
+        `PowerCode Code` = col_skip(), `Reference Period Code` = col_skip(), 
+        `Reference Period` = col_skip(), 
+        Flags = col_skip()))
+
+library(readxl)
 PovertyReport <- read_excel("PovertyReport.xlsx", 
     col_types = c("text", "skip", "skip", 
-        "skip", "numeric", "skip", "numeric", 
+        "skip", "numeric", "numeric", "numeric", 
         "numeric", "numeric", "numeric", 
-        "numeric"), skip = 5) #2019 Data
+        "numeric"), skip = 5)
+```
 
+```{r, echo=FALSE}
 povertyreport <- PovertyReport %>% 
   rename(State = Name,
          povertyrate = 'Percent...2')
 
+country_data <- Country_Minwage %>% 
+  mutate(hourly_min = Value/(52*40))
 ```
 
-```{r}
+```{r, echo=FALSE}
 combined <- Minimum_Wage_Data %>% 
   filter(Year == 2019) %>% 
   left_join(povertyreport, 
-            by = "State")
+            by = "State") %>%
+  mutate(state = str_to_lower(State)) %>% 
+  drop_na(povertyrate)
 ```
 
+## Push For $15
+The recent push to raise the federal minimum wage has gained traction in recent years, and as Joe Biden has taken office the push has only grown more urgent. Most recently, Congressional Democrats have attempted to raise the minimum wage through a provision in the American Rescue Plan (COVID Relief Bill). Even among democrats the minimum wage hike did not have the votes to get through the senate and it has been delayed, potentially for years. The purpose of this project is to explore the how the minimum wage system works in the United States, with both the federal and state governments having a say. I will also explore how minimum wage affects overall quality of life and inequality. 
+
+## "Effective" Minimum Wage
+In the United States States have some power over the minimum wage; However, the minimum wage cannot be lower than the federal minimum wage (7.25/hour). The Effective minimum wage in each state is either that states minimum wage, if it is above 7.25, or it is the federally mandated minimum wage. This is what the effective minimum wages in each state looked like in 2019.
+
 ```{r}
+state_minimum <- map_data("state")
+
+min_wageUS <- combined %>% 
+  ggplot() +
+  geom_map(map = state_minimum,
+           aes(map_id = state, fill = Effective.Minimum.Wage)) +
+  expand_limits(x = state_minimum$long, y = state_minimum$lat) +
+  scale_fill_continuous(name="Wage", 
+            low = "navy", high = "lightblue") +
+  theme_map() +
+  labs(title = "Minimum Hourly Wage in 2019")
+
+ggplotly(min_wageUS)
+```
+
+## Does Minimum Wage Determine Median Income?
+Now we know that minimum wage can vary widely by state, but does it make a difference in how much the median worker is paid. After all, there are many countries where there is no minimum wage and the government relies on the free market to determine a fair wage. The United States presents an interesting case study as there are relatively few barriers to entry and exit, should a firm decide to move to a region where the minimum wage is lower. A company could save almost five dollars per worker per hour if it were to move it's operations one state over from California to Nevada. You would think even between cities there would be differences in minimum wage and thus either differences in unemployment rate or differences in 
+
+```{r}
+
+```
+
+
+
+## How Does The U.S Compare to Other Countries
+
+
+
+```{r, echo=FALSE}
 combined %>% 
-  filter(Effective.Minimum.Wage.2020.Dollars >= 0) %>% 
   ggplot(aes(x = Effective.Minimum.Wage.2020.Dollars, 
              y = povertyrate)) +
   geom_point() +
@@ -75,4 +121,17 @@ combined %>%
 ```
 
 
+Have minimum wage workers incomes kept up with inflation?
+
+```{r}
+Minimum_Wage_Data %>% 
+  filter(State %in% c("Minnesota","Michigan", "California",
+                      "Washington","Texas", "Florida")) %>% 
+  ggplot(aes(x = Year, y = Effective.Minimum.Wage.2020.Dollars, 
+             color = State)) +
+  geom_line()
+```
+
+## Data
+The minimum wage data comes from the United States Department of Labor and encompasses the federal and state minimum wage from 1968-2020. The data set itself comes from [Kaggle](https://www.kaggle.com/lislejoem/us-minimum-wage-by-state-from-1968-to-2017). The poverty rate data comes directly from the United States Department of Agriculture and includes state poverty rate data from 2019. World minimum wage data comes from the  [OECD](https://stats.oecd.org/Index.aspx?DataSetCode=RMW). 
 
